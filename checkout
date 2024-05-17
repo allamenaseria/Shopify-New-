@@ -19,7 +19,7 @@
   (function() {
     window.dataLayer = window.dataLayer || [];
 
-    const eventPrefix = '';
+    const eventPrefix = 'AM_';
     const formatedItemId = true;
     const dataSchema = {
       ecommerce: {
