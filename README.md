@@ -1,4 +1,5 @@
 # Shopify-New-
+--- Get Access by Logging into your Shopify Partner and send Collab Access to the Client Site (May require a code from the client)
 1.Add GTM Tracking Code under head + body <br>
 2.Add Ultimate Datalayer as a snippet<br> 
 3.Add this code under GTM container code {% render 'ultimate-datalayer' %} <br>
