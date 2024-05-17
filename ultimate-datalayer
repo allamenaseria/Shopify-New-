@@ -10,7 +10,7 @@
           window.dataLayer = window.dataLayer || []; 
           
           // use a prefix of events name
-          this.eventPrefix = '';
+          this.eventPrefix = 'AM_';
 
           //Keep the value false to get non-formatted product ID
           this.formattedItemId = true; 
