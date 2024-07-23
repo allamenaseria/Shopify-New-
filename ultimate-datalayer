@@ -1,16 +1,11 @@
-<script>  
-  /**
-  * Version: 2.1.5
-  * Last Update: 13 Apr 2024
-  */
-  
+<script>   
   (function() {
       class Ultimate_Shopify_DataLayer {
         constructor() {
           window.dataLayer = window.dataLayer || []; 
           
           // use a prefix of events name
-          this.eventPrefix = 'AM_';
+          this.eventPrefix = '';
 
           //Keep the value false to get non-formatted product ID
           this.formattedItemId = true; 
@@ -97,6 +92,12 @@
           };
         }
 
+        eventConsole(eventName, eventData) {
+          const css1 = 'background: red; color: #fff; font-size: normal; border-radius: 3px 0 0 3px; padding: 3px 4px;';
+          const css2 = 'background-color: blue; color: #fff; font-size: normal; border-radius: 0 3px 3px 0; padding: 3px 4px;';
+          console.log('%cGTM DataLayer Event:%c' + eventName, css1, css2, eventData);
+        }
+
         collectData() { 
             this.customerData();
             this.ajaxRequestData();
@@ -123,7 +124,7 @@
             this.emailClickData();
         }        
 
-        //logged in customer data 
+        //logged-in customer data 
         customerData() {
             const currentUser = {};
             {% if customer %}
@@ -141,10 +142,10 @@
                   address2: "{{ customer.default_address.address2 }}",
                   city: "{{ customer.default_address.city }}",
                   street: "{{ customer.default_address.street }}",
-                  zip_code: "{{ customer.default_address.zip }}",
+                  zip: "{{ customer.default_address.zip }}",
                   company: "{{ customer.default_address.company }}",
                   country: "{{ customer.default_address.country.name }}",
-                  country_code: "{{ customer.default_address.country_code }}",
+                  countryCode: "{{ customer.default_address.country_code }}",
                   province: "{{ customer.default_address.province }}"
                 };
               {% endif %}
@@ -199,7 +200,7 @@
             return originalFetch.apply(this, arguments).then((response) => {
               if (response.ok) {
                 let cloneResponse = response.clone();
-                let requestURL = arguments[0];
+                let requestURL = arguments[0]['url'] || arguments[0];
                 
                 if(/.*\/search\/?.*\?.*q=.+/.test(requestURL) && !requestURL.includes('&requestFrom=uldt')) {   
                   const queryString = requestURL.split('?')[1];
@@ -888,6 +889,7 @@
           }
 
           dataLayer.push(dataLayerData);
+          self.eventConsole(self.eventPrefix + event, dataLayerData);
         }
 
         
@@ -924,8 +926,11 @@
               
               if(formType && formType.value === 'customer') {
                 dataLayer.push({ event: self.eventPrefix + 'newsletter_signup', ...formData});
+                self.eventConsole(self.eventPrefix + 'newsletter_signup', { event: self.eventPrefix + 'newsletter_signup', ...formData});
+
               } else if(formType && formType.value === 'contact') {
                 dataLayer.push({ event: self.eventPrefix + 'contact_form_submit', ...formData});
+                self.eventConsole(self.eventPrefix + 'contact_form_submit', { event: self.eventPrefix + 'contact_form_submit', ...formData});
               }
             }
           });
@@ -939,13 +944,16 @@
             let target = event.target.closest('a[href^="tel:"]');
             if(target) {
               let phone_number = target.getAttribute('href').replace('tel:', '');
-              dataLayer.push({
+              let eventData = {
                 event: self.eventPrefix + 'phone_number_click',
                 page_location: window.location.href,
                 link_classes: target.getAttribute('class'),
                 link_id: target.getAttribute('id'),
                 phone_number
-              })
+              }
+
+              dataLayer.push(eventData);
+              this.eventConsole(self.eventPrefix + 'phone_number_click', eventData);
             }
           });
         }
@@ -957,13 +965,16 @@
             let target = event.target.closest('a[href^="mailto:"]');
             if(target) {
               let email_address = target.getAttribute('href').replace('mailto:', '');
-              dataLayer.push({
+              let eventData = {
                 event: self.eventPrefix + 'email_click',
                 page_location: window.location.href,
                 link_classes: target.getAttribute('class'),
                 link_id: target.getAttribute('id'),
                 email_address
-              })
+              }
+
+              dataLayer.push(eventData);
+              this.eventConsole(self.eventPrefix + 'email_click', eventData);
             }
           });
         }
